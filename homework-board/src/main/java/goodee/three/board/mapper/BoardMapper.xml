@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- mymatis mapper는 인수를 하나만 가진다 -->
+  
+<mapper namespace = "goodee.three.board.mapper.BoardMapper">
+
+<update id = "updateBoard"
+		parameterType="goodee.three.board.vo.Board">
+	UPDATE board 
+	SET 
+		board_title =	#{boardTitle},
+		board_content =	#{boardContent},
+		board_user =	#{boardUser},
+		board_date =	now()
+	WHERE
+		board_no = #{boardNo}
+	AND
+		board_pw = #{boardPw}
+</update>
+
+<insert id = "insertBoard"
+		parameterType="goodee.three.board.vo.Board">
+	INSERT  
+		board(board_pw,
+			  board_title,
+			  board_content,
+			  board_user,
+			  board_date) 
+		values(#{boardPw},
+		  	   #{boardTitle},
+			   #{boardContent},
+			   #{boardUser},
+		       now())
+</insert>
+
+<delete id = "deleteBoard"
+		parameterType="goodee.three.board.vo.Board">
+	DELETE
+	FROM 
+		board
+	WHERE 
+		board_no = #{boardNo}
+	AND
+		board_pw = #{boardPw}
+</delete>
+
+<select id="selectBoardOne"
+		parameterType="int"
+		resultType="goodee.three.board.vo.Board">
+	SELECT
+		board_no		as	boardNo,
+		board_pw		as	boardPw,
+		board_title		as	boardTitle,
+		board_content	as	boardContent,
+		board_user		as	boardUser,
+		board_date		as	boardDate
+	FROM board
+	WHERE board_no = #{no}
+</select>
+
+<select	id = "selectBoardList"
+		parameterType="goodee.three.board.vo.Page"
+		resultType="goodee.three.board.vo.Board">
+	SELECT
+		board_no		as	boardNo,
+		board_pw		as	boardPw,
+		board_title		as	boardTitle,
+		board_content	as	boardContent,
+		board_user		as	boardUser,
+		board_date		as	boardDate
+	FROM board
+		<where>
+			<if test = "searchWord != null">
+				board_title like CONCAT('%',#{searchWord},'%')
+			</if>
+		</where>
+	ORDER BY board_date
+	DESC LIMIT #{beginRow}, #{rowPerPage}
+</select>
+
+<select id = "countRow"
+		parameterType="goodee.three.board.vo.Page"
+		resultType="int">
+	SELECT
+		COUNT(*)
+	FROM board
+	<where>
+		<if test = "searchWord != null">
+           	 board_title like CONCAT('%', #{searchWord}, '%')
+        </if>
+	</where>
+</select>
+</mapper>
